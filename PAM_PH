@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profissões do Futuro — IA</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0e0c1a;
+    color: #e8e6f0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 500;
+    color: #CECBF6;
+    text-align: center;
+    margin-bottom: 4px;
+    letter-spacing: 0.01em;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: #7F77DD;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .hint {
+    font-size: 12px;
+    color: #5F5E5A;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  svg { display: block; width: 100%; max-width: 680px; }
+
+  @keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 0.5; }
+    70% { transform: scale(1.18); opacity: 0; }
+    100% { transform: scale(1.18); opacity: 0; }
+  }
+  @keyframes orbit-glow {
+    0%, 100% { opacity: 0.18; }
+    50% { opacity: 0.38; }
+  }
+  @keyframes float-card {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+  }
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .pulse { animation: pulse-ring 2.2s ease-out infinite; }
+    .orbit-ring { animation: orbit-glow 3s ease-in-out infinite; }
+    .float { animation: float-card 4s ease-in-out infinite; }
+    .spin { animation: spin-slow 28s linear infinite; transform-origin: 340px 310px; }
+  }
+
+  .prof-node { cursor: pointer; }
+  .prof-node:hover circle { filter: brightness(1.15); }
+
+  #detail-panel {
+    display: none;
+    animation: fade-in-up 0.3s ease both;
+    background: #1a1630;
+    border: 0.5px solid #3C3489;
+    border-radius: 16px;
+    padding: 20px 24px 18px;
+    margin: 0 0 12px;
+    width: 100%;
+    max-width: 680px;
+  }
+  #detail-panel.visible { display: block; }
+
+  .dp-tag {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    color: #7F77DD;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .dp-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: #CECBF6;
+    margin-bottom: 10px;
+  }
+  .dp-desc {
+    font-size: 14px;
+    color: #B4B2A9;
+    line-height: 1.65;
+    margin-bottom: 14px;
+  }
+  .dp-section-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: #5F5E5A;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .tag {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin: 3px 4px 3px 0;
+  }
+  .dp-now {
+    font-size: 13px;
+    color: #B4B2A9;
+    line-height: 1.6;
+    background: #12101f;
+    border-left: 2px solid #534AB7;
+    padding: 10px 14px;
+    border-radius: 0 8px 8px 0;
+    margin-top: 4px;
+  }
+  .close-btn {
+    float: right;
+    background: none;
+    border: 0.5px solid #3C3489;
+    border-radius: 8px;
+    padding: 3px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #7F77DD;
+    margin-left: 8px;
+    font-family: inherit;
+  }
+  .close-btn:hover { background: #26215C; }
+
+  footer {
+    margin-top: 32px;
+    font-size: 11px;
+    color: #444441;
+    text-align: center;
+    line-height: 1.8;
+  }
+</style>
+</head>
+<body>
+
+<h1>Profissões do Futuro</h1>
+<p class="subtitle">Inteligência Artificial precisa de humanos por trás</p>
+<p class="hint">Clique em cada profissão para explorar</p>
+
+<div id="detail-panel">
+  <button class="close-btn" onclick="closePanel()">fechar ✕</button>
+  <p class="dp-tag" id="dp-tag"></p>
+  <p class="dp-title" id="dp-title"></p>
+  <p class="dp-desc" id="dp-desc"></p>
+  <p class="dp-section-label">Habilidades-chave</p>
+  <div id="dp-skills"></div>
+  <p class="dp-section-label" style="margin-top:14px">Para você, hoje</p>
+  <p class="dp-now" id="dp-now"></p>
+</div>
+
+<svg viewBox="0 0 680 620" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="aura1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7F77DD" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#7F77DD" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aura2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1D9E75" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#1D9E75" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="core-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#AFA9EC" stop-opacity="0.5"/>
+      <stop offset="60%" stop-color="#7F77DD" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#7F77DD" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Aura layers -->
+  <ellipse cx="340" cy="310" rx="260" ry="250" fill="url(#aura1)"/>
+  <ellipse cx="340" cy="310" rx="150" ry="145" fill="url(#aura2)"/>
+
+  <!-- Orbit rings -->
+  <ellipse class="orbit-ring" cx="340" cy="310" rx="228" ry="218" fill="none" stroke="#7F77DD" stroke-width="0.8" stroke-dasharray="6 8"/>
+  <ellipse class="orbit-ring" cx="340" cy="310" rx="184" ry="176" fill="none" stroke="#1D9E75" stroke-width="0.5" stroke-dasharray="3 12" style="animation-delay:1.1s"/>
+
+  <!-- Spinning dots -->
+  <g class="spin">
+    <circle cx="340" cy="92" r="3" fill="#AFA9EC" opacity="0.5"/>
+    <circle cx="562" cy="220" r="2" fill="#5DCAA5" opacity="0.4"/>
+    <circle cx="482" cy="522" r="2.5" fill="#AFA9EC" opacity="0.35"/>
+    <circle cx="174" cy="502" r="2" fill="#5DCAA5" opacity="0.4"/>
+    <circle cx="116" cy="208" r="3" fill="#AFA9EC" opacity="0.45"/>
+  </g>
+
+  <!-- Connector lines -->
+  <line x1="340" y1="248" x2="340" y2="152" stroke="#7F77DD" stroke-width="0.6" stroke-dasharray="4 5" opacity="0.5"/>
+  <line x1="394" y1="268" x2="488" y2="198" stroke="#1D9E75" stroke-width="0.6" stroke-dasharray="4 5" opacity="0.5"/>
+  <line x1="372" y1="355" x2="440" y2="458" stroke="#D85A30" stroke-width="0.6" stroke-dasharray="4 5" opacity="0.5"/>
+  <line x1="286" y1="355" x2="220" y2="458" stroke="#BA7517" stroke-width="0.6" stroke-dasharray="4 5" opacity="0.5"/>
+  <line x1="284" y1="270" x2="192" y2="198" stroke="#D4537E" stroke-width="0.6" stroke-dasharray="4 5" opacity="0.5"/>
+
+  <!-- Core pulse rings -->
+  <circle class="pulse" cx="340" cy="310" r="68" fill="none" stroke="#7F77DD" stroke-width="1.2"/>
+  <circle class="pulse" cx="340" cy="310" r="68" fill="none" stroke="#7F77DD" stroke-width="0.6" style="animation-delay:1.1s"/>
+
+  <!-- Core node -->
+  <circle cx="340" cy="310" r="62" fill="#1a1035" stroke="#AFA9EC" stroke-width="1"/>
+  <circle cx="340" cy="310" r="48" fill="#534AB7" stroke="none"/>
+  <text x="340" y="303" text-anchor="middle" font-size="13" font-weight="500" fill="#CECBF6" font-family="-apple-system, sans-serif">Inteligência</text>
+  <text x="340" y="320" text-anchor="middle" font-size="13" font-weight="500" fill="#CECBF6" font-family="-apple-system, sans-serif">Artificial</text>
+
+  <!-- Planet 1: Engenheiro de Prompt — top -->
+  <g class="prof-node float" style="animation-delay:0s" onclick="showPanel(0)">
+    <circle cx="340" cy="130" r="46" fill="#26215C" stroke="#AFA9EC" stroke-width="1.2"/>
+    <circle cx="340" cy="130" r="40" fill="#534AB7" stroke="none"/>
+    <text x="340" y="124" text-anchor="middle" font-size="11" font-weight="500" fill="#CECBF6" font-family="-apple-system, sans-serif">Engenheiro(a)</text>
+    <text x="340" y="139" text-anchor="middle" font-size="11" fill="#AFA9EC" font-family="-apple-system, sans-serif">de Prompt</text>
+  </g>
+
+  <!-- Planet 2: Analista de Ética — top right -->
+  <g class="prof-node float" style="animation-delay:0.6s" onclick="showPanel(1)">
+    <circle cx="524" cy="215" r="46" fill="#04342C" stroke="#5DCAA5" stroke-width="1.2"/>
+    <circle cx="524" cy="215" r="40" fill="#0F6E56" stroke="none"/>
+    <text x="524" y="209" text-anchor="middle" font-size="11" font-weight="500" fill="#9FE1CB" font-family="-apple-system, sans-serif">Analista de</text>
+    <text x="524" y="224" text-anchor="middle" font-size="11" fill="#5DCAA5" font-family="-apple-system, sans-serif">Ética de IA</text>
+  </g>
+
+  <!-- Planet 3: Curador de Dados — bottom right -->
+  <g class="prof-node float" style="animation-delay:1.2s" onclick="showPanel(2)">
+    <circle cx="456" cy="482" r="46" fill="#4A1B0C" stroke="#F0997B" stroke-width="1.2"/>
+    <circle cx="456" cy="482" r="40" fill="#712B13" stroke="none"/>
+    <text x="456" y="476" text-anchor="middle" font-size="11" font-weight="500" fill="#F5C4B3" font-family="-apple-system, sans-serif">Curador(a)</text>
+    <text x="456" y="491" text-anchor="middle" font-size="11" fill="#F0997B" font-family="-apple-system, sans-serif">de Dados</text>
+  </g>
+
+  <!-- Planet 4: Gestor de Mudança — bottom left -->
+  <g class="prof-node float" style="animation-delay:1.8s" onclick="showPanel(3)">
+    <circle cx="224" cy="482" r="46" fill="#412402" stroke="#EF9F27" stroke-width="1.2"/>
+    <circle cx="224" cy="482" r="40" fill="#633806" stroke="none"/>
+    <text x="224" y="476" text-anchor="middle" font-size="11" font-weight="500" fill="#FAC775" font-family="-apple-system, sans-serif">Gestor(a) de</text>
+    <text x="224" y="491" text-anchor="middle" font-size="11" fill="#EF9F27" font-family="-apple-system, sans-serif">Mudança IA</text>
+  </g>
+
+  <!-- Planet 5: Homem-Máquina — top left -->
+  <g class="prof-node float" style="animation-delay:2.4s" onclick="showPanel(4)">
+    <circle cx="156" cy="215" r="46" fill="#4B1528" stroke="#ED93B1" stroke-width="1.2"/>
+    <circle cx="156" cy="215" r="40" fill="#72243E" stroke="none"/>
+    <text x="156" y="209" text-anchor="middle" font-size="11" font-weight="500" fill="#F4C0D1" font-family="-apple-system, sans-serif">Integração</text>
+    <text x="156" y="224" text-anchor="middle" font-size="11" fill="#ED93B1" font-family="-apple-system, sans-serif">Homem-Máquina</text>
+  </g>
+
+  <text x="340" y="600" text-anchor="middle" font-size="11" fill="#444441" font-family="-apple-system, sans-serif">clique em cada profissão para explorar</text>
+</svg>
+
+<footer>
+  Profissões do Futuro · Apresentação 8º ano EF2<br>
+  Projeto LetrAção · PROFESP / UNIFA
+</footer>
+
+<script>
+const data = [
+  {
+    tag: "linguagem + criatividade + lógica",
+    title: "Engenheiro(a) de Prompt",
+    desc: "É a pessoa que sabe conversar com a IA do jeito certo. Ela cria os 'comandos' perfeitos para que a IA entenda exatamente o que se quer — e entregue resultados incríveis. Quanto mais claro e estratégico o prompt, melhor o resultado.",
+    skills: [
+      { label: "Escrita criativa", bg: "#EEEDFE", color: "#3C3489" },
+      { label: "Lógica de raciocínio", bg: "#EEEDFE", color: "#3C3489" },
+      { label: "Curiosidade", bg: "#CECBF6", color: "#26215C" },
+      { label: "Testes e iteração", bg: "#EEEDFE", color: "#3C3489" },
+      { label: "Como a IA pensa", bg: "#CECBF6", color: "#26215C" }
+    ],
+    now: "Quem desenvolve clareza na escrita, lê bastante e gosta de resolver problemas de formas diferentes já tem uma vantagem enorme aqui."
+  },
+  {
+    tag: "ética + direito + tecnologia",
+    title: "Analista de Ética e Conformidade de IA",
+    desc: "Garante que a IA seja justa, legal e não discriminatória. Analisa se sistemas de IA estão prejudicando pessoas sem querer — por preconceito nos dados, por uso indevido ou por falta de transparência.",
+    skills: [
+      { label: "Pensamento crítico", bg: "#E1F5EE", color: "#085041" },
+      { label: "Conhecimento jurídico", bg: "#E1F5EE", color: "#085041" },
+      { label: "Identificar injustiças", bg: "#9FE1CB", color: "#04342C" },
+      { label: "Comunicação", bg: "#E1F5EE", color: "#085041" },
+      { label: "Coragem para dizer não", bg: "#9FE1CB", color: "#04342C" }
+    ],
+    now: "Quem gosta de debates, de questionar o que parece errado e de entender regras e leis — essa profissão foi feita pra você."
+  },
+  {
+    tag: "dados + organização + qualidade",
+    title: "Curador(a) e Treinador(a) de Dados de IA",
+    desc: "A IA aprende com os dados que recebe. Se os dados forem ruins ou enviesados, ela vai crescer torta. Esse profissional seleciona, organiza e 'limpa' as informações — garantindo que a IA aprenda as coisas certas.",
+    skills: [
+      { label: "Atenção a detalhes", bg: "#FAECE7", color: "#712B13" },
+      { label: "Organização", bg: "#FAECE7", color: "#712B13" },
+      { label: "Identificar padrões", bg: "#F5C4B3", color: "#4A1B0C" },
+      { label: "Estatística básica", bg: "#FAECE7", color: "#712B13" },
+      { label: "Senso crítico", bg: "#F5C4B3", color: "#4A1B0C" }
+    ],
+    now: "Quem gosta de organizar coisas, de planilhas e categorias — e também quem gosta de ciências — vai se dar muito bem aqui."
+  },
+  {
+    tag: "pessoas + liderança + mudança",
+    title: "Gestor(a) de Mudança e Integração de IA",
+    desc: "Quando uma empresa adota IA, os funcionários entram em pânico. Esse profissional é o tradutor entre o mundo da tecnologia e o mundo das pessoas — treinando, explicando e guiando a transição com empatia.",
+    skills: [
+      { label: "Empatia", bg: "#FAEEDA", color: "#633806" },
+      { label: "Liderança", bg: "#FAEEDA", color: "#633806" },
+      { label: "Ensinar bem", bg: "#FAC775", color: "#412402" },
+      { label: "Gestão de conflitos", bg: "#FAEEDA", color: "#633806" },
+      { label: "Comunicação clara", bg: "#FAC775", color: "#412402" }
+    ],
+    now: "Sabe aquela pessoa que os amigos buscam quando estão perdidos, que explica as coisas de um jeito que todo mundo entende? É exatamente esse perfil."
+  },
+  {
+    tag: "neurociência + engenharia + design",
+    title: "Especialista em Integração Homem-Máquina",
+    desc: "Próteses controladas pelo pensamento, óculos de realidade aumentada, robôs ao lado de cirurgiões. Esse profissional garante que a parceria entre corpo humano e máquina seja segura, eficiente e ética.",
+    skills: [
+      { label: "Engenharia", bg: "#FBEAF0", color: "#72243E" },
+      { label: "Medicina / Neurociência", bg: "#FBEAF0", color: "#72243E" },
+      { label: "Design de experiência", bg: "#F4C0D1", color: "#4B1528" },
+      { label: "Pensamento interdisciplinar", bg: "#FBEAF0", color: "#72243E" },
+      { label: "Ética tecnológica", bg: "#F4C0D1", color: "#4B1528" }
+    ],
+    now: "Quem tem curiosidade em várias áreas ao mesmo tempo — que gosta de biologia E de tecnologia — é exatamente o perfil que esse mercado vai precisar."
+  }
+];
+
+function showPanel(i) {
+  const d = data[i];
+  const panel = document.getElementById('detail-panel');
+  document.getElementById('dp-tag').textContent = d.tag;
+  document.getElementById('dp-title').textContent = d.title;
+  document.getElementById('dp-desc').textContent = d.desc;
+  document.getElementById('dp-now').textContent = d.now;
+  document.getElementById('dp-skills').innerHTML = d.skills.map(s =>
+    `<span class="tag" style="background:${s.bg};color:${s.color}">${s.label}</span>`
+  ).join('');
+  panel.classList.add('visible');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function closePanel() {
+  document.getElementById('detail-panel').classList.remove('visible');
+}
+</script>
+</body>
+</html>
